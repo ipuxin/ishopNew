@@ -20,7 +20,7 @@ use yii\helpers\Html;
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                <button class="btn-block btn-lg btn btn-twitter"><i class="fa fa-weibo"></i> 使用新浪微博账号登录
+                                <button id="login_weibo" class="btn-block btn-lg btn btn-twitter"><i class="fa fa-weibo"></i> 使用新浪微博账号登录
                                 </button>
                             </div>
                         </div>
@@ -106,9 +106,14 @@ use yii\helpers\Html;
 </main><!-- /.authentication -->
 <!-- ========================================= MAIN : END ========================================= -->
 <!-- ============================================================= FOOTER ============================================================= -->
-<script>
+<script>login_weibo
     var qqbtn = document.getElementById('login_qq');
     qqbtn.onclick = function () {
         window.location.href = "<?= yii\helpers\Url::to(['member/qqlogin']) ?>";
+    }
+
+    var weibobtn = document.getElementById('login_weibo');
+    weibobtn.onclick = function () {
+        window.location.href = "<?= yii\helpers\Url::to(['member/wblogin']) ?>";
     }
 </script>

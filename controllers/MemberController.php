@@ -178,4 +178,13 @@ array(18) {
         }
         return $this->render('qqreg', ['model' => $model]);
     }
+
+    public function actionWblogin(){
+        require_once('../vendor/weibo/saetv2.ex.class.php');
+
+        define('WB_KEY','3917955188');
+        define('WB_SEC','9c62b6915b64dff5c688d75019b4cf8e');
+        define('WB_CALLBACK_URL','http://www.ipuxin.com/callback.php');
+        exit('wb');
+    }
 }
