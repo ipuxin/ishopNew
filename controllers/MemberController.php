@@ -184,7 +184,13 @@ array(18) {
 
         define('WB_KEY','3917955188');
         define('WB_SEC','9c62b6915b64dff5c688d75019b4cf8e');
-        define('WB_CALLBACK_URL','http://www.ipuxin.com/callback.php');
-        exit('wb');
+        define('WB_CALLBACK_URL','http://ishop.ipuxin.com/callback.php');
+
+        $saeTOAuthV2 = new SaeTOAuthV2(WB_KEY, WB_SEC);
+
+//返回生命周期很短的code:9d891772ec1e7578389825d5bc95e197
+        $authorizeURL = $saeTOAuthV2->getAuthorizeURL(WB_CALLBACK_URL);
+
+        header('Location:' . $authorizeURL);
     }
 }
