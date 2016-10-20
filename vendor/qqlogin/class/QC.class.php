@@ -16,14 +16,14 @@ class QC extends Oauth{
      * _construct
      *
      * 构造方法
-     * @access public 
+     * @access public
      * @since 5
      * @param string $access_token  access_token value
      * @param string $openid        openid value
      * @return Object QC
      */
     public function __construct($access_token = "", $openid = ""){
-        parent::__construct();
+        @parent::__construct();
 
         //如果access_token和openid为空，则从session里去取，适用于demo展示情形
         if($access_token === "" || $openid === ""){
@@ -46,8 +46,8 @@ class QC extends Oauth{
          * 规则 array( baseUrl, argListArr, method)
          */
         $this->APIMap = array(
-        
-            
+
+
             /*                       qzone                    */
             "add_blog" => array(
                 "https://graph.qq.com/blog/add_one_blog",
@@ -274,7 +274,7 @@ class QC extends Oauth{
         return $arr;
     }
 
-   
+
     /**
      * get_access_token
      * 获得access_token

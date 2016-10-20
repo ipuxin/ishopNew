@@ -68,8 +68,10 @@ class MemberController extends CommonController
     public function actionQqlogin()
     {
         require_once("../vendor/qqlogin/qqConnectAPI.php");
+
         $qc = new \QC();
         $qc->qq_login();
+
     }
 
     /*
@@ -108,7 +110,7 @@ array(18) {
          * 获取用户授权后的信息
          * 取得accessToken和openid
          */
-        $auth = new \OAuth();
+        $auth = new \QC();
         $accessToken = $auth->qq_callback();
         $openid = $auth->get_openid();
 
