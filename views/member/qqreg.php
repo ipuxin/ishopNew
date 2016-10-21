@@ -1,24 +1,25 @@
 <?php
-    use yii\bootstrap\ActiveForm;
-    use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+
 ?>
-<!-- ============================================================= HEADER : END ============================================================= -->		<!-- ========================================= MAIN ========================================= -->
+<!-- ============================================================= HEADER : END ============================================================= -->        <!-- ========================================= MAIN ========================================= -->
 <main id="authentication" class="inner-bottom-md">
-	<div class="container">
-		<div class="row">
-			
-			<div class="col-md-6">
-				<section class="section sign-in inner-right-xs">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-6">
+                <section class="section sign-in inner-right-xs">
                     <h2 class="bordered">
 
                         <!--显示一个50像素的头像-->
                         <img src="<?php echo Yii::$app->session['userinfo']['figureurl_1'] ?>">
                         绑定QQ登录, 快速登录
                     </h2>
-					<p>请填写一个用户名和密码</p>
+                    <p>请填写一个用户名和密码</p>
 
-					<div class="social-auth-buttons">
-					</div>
+                    <div class="social-auth-buttons">
+                    </div>
                     <?php $form = ActiveForm::begin([
                         'fieldConfig' => [
                             'template' => '<div class="field-row">{label}{input}</div>{error}'
@@ -28,32 +29,35 @@
                             'role' => 'form',
                         ],
                         //'action' => ['member/auth'],
-                    ]); ?>
-                        <input type="text" value="<?php echo Yii::$app->session['userinfo']['nickname'] ?>" class="le-input"><br>
-                        <?php echo $form->field($model, 'username')->textInput(['class' => 'le-input']); ?>
-                        <?php echo $form->field($model, 'userpass')->passwordInput(['class' => 'le-input']); ?>
-                        <?php echo $form->field($model, 'repass')->passwordInput(['class' => 'le-input']); ?>
-                        <div class="field-row clearfix">
-                        </div>
+                    ]);
+                    $nickname = Yii::$app->session['userinfo']['nickname'];
+                    ?>
+                    <input type="text" value="<?= $nickname; ?>" class="le-input"><br>
+                    <?php echo $form->field($model, 'username')
+                        ->textInput(['class' => 'le-input', 'value' => $nickname]); ?>
+                    <?php echo $form->field($model, 'userpass')->passwordInput(['class' => 'le-input']); ?>
+                    <?php echo $form->field($model, 'repass')->passwordInput(['class' => 'le-input']); ?>
+                    <div class="field-row clearfix">
+                    </div>
 
-                        <div class="buttons-holder">
-                            <?php echo Html::submitButton('完成绑定', ['class' => 'le-button huge']); ?>
-                        </div><!-- /.buttons-holder -->
+                    <div class="buttons-holder">
+                        <?php echo Html::submitButton('完成绑定', ['class' => 'le-button huge']); ?>
+                    </div><!-- /.buttons-holder -->
 
                     <?php ActiveForm::end(); ?><!-- /.cf-style-1 -->
 
-				</section><!-- /.sign-in -->
-			</div><!-- /.col -->
+                </section><!-- /.sign-in -->
+            </div><!-- /.col -->
 
-		</div><!-- /.row -->
-	</div><!-- /.container -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
 </main><!-- /.authentication -->
 <!-- ========================================= MAIN : END ========================================= -->
 <!-- ============================================================= FOOTER ============================================================= -->
 <script>
     var qqbtn = document.getElementById("login_qq");
-    qqbtn.onclick = function(){
-        window.location.href="<?php echo yii\helpers\Url::to(['member/qqlogin']) ?>";
+    qqbtn.onclick = function () {
+        window.location.href = "<?php echo yii\helpers\Url::to(['member/qqlogin']) ?>";
     }
 </script>
 
