@@ -285,14 +285,14 @@ array(18) {
         if (Yii::$app->request->isPost) {
             $post = Yii::$app->request->post();
             $session = Yii::$app->session;
-            $post['User']['openid'] = $session['openid'];
+            $post['User']['wbuid'] = $session['wb_uid'];
 
             /**
              * 开始注册,设置新的注册场景qqreg,
              * 如果祝成功,保存用户登录信息到session,之后跳转到首页
              */
-            if ($model->reg($post, 'qqreg')) {
-                $session['loginname'] = $session['userinfo']['nickname'];
+            if ($model->reg($post, 'wbreg')) {
+                $session['loginname'] = $session['screen_name'];
                 $session['isLogin'] = 1;
                 return $this->redirect(['index/index']);
             }
