@@ -1,7 +1,8 @@
 <?php
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
-
+$screen_name = Yii::$app->session['screen_name'];
+$profile_image_url = Yii::$app->session['profile_image_url'];
 ?>
 <!-- ============================================================= HEADER : END ============================================================= -->        <!-- ========================================= MAIN ========================================= -->
 <main id="authentication" class="inner-bottom-md">
@@ -13,7 +14,7 @@ use yii\helpers\Html;
                     <h2 class="bordered">
 
                         <!--显示一个50像素的头像-->
-                        <img src="<?php echo Yii::$app->session['userinfo']['figureurl_1'] ?>">
+                        <img src="<?= $profile_image_url ?>">
                         绑定微博登录, 快速登录
                     </h2>
                     <p>请填写一个用户名和密码</p>
@@ -30,11 +31,11 @@ use yii\helpers\Html;
                         ],
                         //'action' => ['member/auth'],
                     ]);
-                    $loginname = Yii::$app->session['loginname'];
+                    $loginname = Yii::$app->session['screen_name'];
                     ?>
-                    <input type="text" value="<?= $loginname ?>" class="le-input"><br>
+                    <input type="text" value="<?= $screen_name ?>" class="le-input"><br>
                     <?php echo $form->field($model, 'username')
-                        ->textInput(['class' => 'le-input', 'value' => $loginname]); ?>
+                        ->textInput(['class' => 'le-input', 'value' => $screen_name]); ?>
                     <?php echo $form->field($model, 'userpass')->passwordInput(['class' => 'le-input']); ?>
                     <?php echo $form->field($model, 'repass')->passwordInput(['class' => 'le-input']); ?>
                     <div class="field-row clearfix">

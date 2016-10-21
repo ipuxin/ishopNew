@@ -246,16 +246,18 @@ array(18) {
 
         //4.关闭
         curl_close($curlobj);
-        //{"id":5232895940,"idstr":"5232895940","class":1,"screen_name":"于和正09053","name":"于和正09053","province":"100","city":"1000","location":"其他","description":"","url":"","profile_image_url":"http://tva1.sinaimg.cn/default/images/default_avatar_male_50.gif","cover_image_phone":"http://ww1.sinaimg.cn/crop.0.0.640.640.640/549d0121tw1egm1kjly3jj20hs0hsq4f.jpg","profile_url":"u/5232895940","domain":"","weihao":"","gender":"m","followers_count":3,"friends_count":27,"pagefriends_count":1,"statuses_count":38,"favourites_count":2,"created_at":"Sat Jul 26 13:08:36 +0800 2014","following":false,"allow_all_act_msg":false,"geo_enabled":true,"verified":false,"verified_type":-1,"remark":"","status":{"created_at":"Thu Sep 29 08:44:49 +0800 2016","id":4024964958815965,"mid":"4024964958815965","idstr":"4024964958815965","text":"This is 微博, come from 火星","textLength":28,"source_allowclick":0,"source_type":1,"source":"未通过审核应用","favorited":false,"truncated":false,"in_reply_to_status_id":"","in_reply_to_user_id":"","in_reply_to_screen_name":"","pic_urls":[],"geo":null,"reposts_count":0,"comments_count":0,"attitudes_count":0,"isLongText":false,"mlevel":0,"visible":{"type":0,"list_id":0},"biz_feature":0,"hasActionTypeCard":0,"darwin_tags":[],"hot_weibo_tags":[],"text_tag_tips":[],"userType":0,"positive_recom_flag":0,"gif_ids":"","is_show_bulletin":2},"ptype":0,"allow_all_comment":true,"avatar_large":"http://tva1.sinaimg.cn/default/images/default_avatar_male_180.gif","avatar_hd":"http://tva1.sinaimg.cn/default/images/default_avatar_male_180.gif","verified_reason":"","verified_trade":"","verified_reason_url":"","verified_source":"","verified_source_url":"","follow_me":false,"online_status":0,"bi_followers_count":0,"lang":"zh-cn","star":0,"mbtype":0,"mbrank":0,"block_word":0,"block_app":0,"credit_score":80,"user_ability":0,"urank":4}
 
         $wbUserInfo = json_decode($output, true);
 
+        $session = Yii::$app->session;
+        //存储用户微博昵称
         $session['screen_name'] = $wbUserInfo['screen_name'];
+        //存储用户头像
+        $session['profile_image_url'] = $wbUserInfo['profile_image_url'];
         $session['wb_accesstoken'] = $wbaccess_token;
         $session['wb_uid'] = $wbuid;
 
-        Tools::debug($session['wb_uid'], '$session[\'wb_uid\']', true);
-
+//        Tools::debug(Yii::$app->session['profile_image_url'],'Yii::$app->session[\'profile_image_url\']',true);
         /**
          * 根据uid判断用户是否已经登录
          * 如果用户已经绑定,存储用户登录信息,之后跳转到首页
