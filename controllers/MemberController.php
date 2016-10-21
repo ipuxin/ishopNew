@@ -3,12 +3,15 @@ namespace app\controllers;
 
 use yii\web\Controller;
 use app\models\User;
+use app\common\helps\Tools;
 use yii\helpers\Url;
 use Yii;
 
 class MemberController extends CommonController
 {
+    //App Key
     const WB_KEY = '3917955188';
+    //App Secret
     const WB_SEC = '9c62b6915b64dff5c688d75019b4cf8e';
 //        define('WB_CALLBACK_URL',Url::to(['member/wbcallback']));
     const WB_CALLBACK_URL = 'http://ishop.ipuxin.com/index.php?r=member/wbcallback';
@@ -185,26 +188,25 @@ array(18) {
         return $this->render('qqreg', ['model' => $model]);
     }
 
+    /**
+     * 第三方登录
+     * 第一步:跳转到授权页面,用户同意后,完成授权,通过回调地址,进行下一步
+     * 方法:通过拼接一个含有回调地址的url 加上 App Key和App Secret,三部分的地址
+     *
+     */
     public function actionWblogin()
     {
         require_once('../vendor/weibo/saetv2.ex.class.php');
-
-
         $saeTOAuthV2 = new \SaeTOAuthV2(self::WB_KEY, self::WB_SEC);
-
-        //返回生命周期很短的code:9d891772ec1e7578389825d5bc95e197
         $authorizeURL = $saeTOAuthV2->getAuthorizeURL(self::WB_CALLBACK_URL);
 
-        /**
-         * 跳转到微博授权页面
-         * https://api.weibo.com/oauth2/authorize?client_id=3917955188&redirect_uri=http%3A%2F%2Fishop.ipuxin.com%2Findex.php%3Fr%3Dmember%2Fwbcallback&response_type=code
-         */
         echo "<script>window.location.href='" . $authorizeURL . "'</script>";
     }
 
     /**
+     * 第三方登录
+     * 第二步:授权后,获取code,进一步获取access_token,uid
      * @return string
-     * 成功授权后,获得code.
      */
     public function actionWbcallback()
     {
@@ -219,22 +221,53 @@ array(18) {
         $saeTOAuthV2 = new \SaeTOAuthV2(self::WB_KEY, self::WB_SEC);
         $wb_auth = $saeTOAuthV2->getAccessToken($keys);
 
+        $wbaccess_token = $wb_auth['access_token'];
+        $wbUIDOld = $wb_auth['uid'];
+        $wbuid = md5(md5(md5($wbUIDOld), true) . 'ipuxin521');
+
+        setcookie('wb_accesstoken', $wbaccess_token, time() + $wb_auth['expires_in']);
+        setcookie('wb_uid', $wbuid, time() + $wb_auth['expires_in']);
+
         /**
-         * $wb_auth:
-         * Array (
-         * [access_token] => 2.00Fpg7bGcH2JRE3c7ceb03ddEvHeCD
-         * [remind_in] => 150494
-         * [expires_in] => 150494
-         * [uid] => 6049882567 )
+         * 获取用户信息
          */
-        setcookie('wb_accesstoken', $wb_auth['access_token'], time() + $wb_auth['expires_in']);
-        setcookie('wb_uid', $wb_auth['wb_uid'], time() + $wb_auth['expires_in']);
+        $wbUserInfoURL = "https://api.weibo.com/2/users/show.json?access_token={$wbaccess_token}&uid={$wbUIDOld}";
+
+        //获取imooc
+        //1.初始化curl
+        $curlobj = curl_init();
+
+        //2.设置curl的参数
+        curl_setopt($curlobj, CURLOPT_URL, $wbUserInfoURL);
+        //不显示头信息
+        curl_setopt($curlobj, CURLOPT_HEADER, 0);
+        //不直接打印
+        curl_setopt($curlobj, CURLOPT_RETURNTRANSFER, 1);
+
+        //3.采集
+        $output = curl_exec($curlobj);
+
+        //4.关闭
+        curl_close($curlobj);
+        Tools::debug($output,'$output',true);
+
+        /**
+         * 根据uid判断用户是否已经登录
+         * 如果用户已经绑定,存储用户登录信息,之后跳转到首页
+         */
+        if (User::find()->where('wbuid=:wbuid', [':wbuid' => $wbuid])->one()) {
+            $session['loginname'] = $userinfo['nickname'];
+            $session['openid'] = $openid;
+            $session['isLogin'] = 1;
+            return $this->redirect(['index/index']);
+        }
 
         //如果用户没有绑定,则让用户重新注册
         return $this->redirect(['wbreg']);
     }
 
-    public function actionWbreg(){
+    public function actionWbreg()
+    {
         //加载视图
         $this->layout = 'layout2';
         $model = new User;
