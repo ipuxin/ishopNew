@@ -3,10 +3,16 @@ namespace app\controllers;
 
 use yii\web\Controller;
 use app\models\User;
+use yii\helpers\Url;
 use Yii;
 
 class MemberController extends CommonController
 {
+    const WB_KEY = '3917955188';
+    const WB_SEC = '9c62b6915b64dff5c688d75019b4cf8e';
+//        define('WB_CALLBACK_URL',Url::to(['member/wbcallback']));
+    const WB_CALLBACK_URL = 'http://ishop.ipuxin.com/index.php?r=member/wbcallback';
+
 //    public $layout = false;
 
     /**
@@ -179,18 +185,84 @@ array(18) {
         return $this->render('qqreg', ['model' => $model]);
     }
 
-    public function actionWblogin(){
+    public function actionWblogin()
+    {
         require_once('../vendor/weibo/saetv2.ex.class.php');
 
-        define('WB_KEY','3917955188');
-        define('WB_SEC','9c62b6915b64dff5c688d75019b4cf8e');
-        define('WB_CALLBACK_URL','http://ishop.ipuxin.com/callback.php');
 
-        $saeTOAuthV2 = new SaeTOAuthV2(WB_KEY, WB_SEC);
+        $saeTOAuthV2 = new \SaeTOAuthV2(self::WB_KEY, self::WB_SEC);
 
-//返回生命周期很短的code:9d891772ec1e7578389825d5bc95e197
-        $authorizeURL = $saeTOAuthV2->getAuthorizeURL(WB_CALLBACK_URL);
+        //返回生命周期很短的code:9d891772ec1e7578389825d5bc95e197
+        $authorizeURL = $saeTOAuthV2->getAuthorizeURL(self::WB_CALLBACK_URL);
 
-        header('Location:' . $authorizeURL);
+        /**
+         * 跳转到微博授权页面
+         * https://api.weibo.com/oauth2/authorize?client_id=3917955188&redirect_uri=http%3A%2F%2Fishop.ipuxin.com%2Findex.php%3Fr%3Dmember%2Fwbcallback&response_type=code
+         */
+        echo "<script>window.location.href='" . $authorizeURL . "'</script>";
+    }
+
+    /**
+     * @return string
+     * 成功授权后,获得code.
+     */
+    public function actionWbcallback()
+    {
+        require_once('../vendor/weibo/saetv2.ex.class.php');
+        //获取生命周期很短的code, 拿到accesstoken
+        $code = $_GET['code'];
+
+        //查询方法后, 组合参数
+        $keys['code'] = $code;
+        $keys['redirect_uri'] = self::WB_CALLBACK_URL;
+
+        $saeTOAuthV2 = new \SaeTOAuthV2(self::WB_KEY, self::WB_SEC);
+        $wb_auth = $saeTOAuthV2->getAccessToken($keys);
+
+        /**
+         * $wb_auth:
+         * Array (
+         * [access_token] => 2.00Fpg7bGcH2JRE3c7ceb03ddEvHeCD
+         * [remind_in] => 150494
+         * [expires_in] => 150494
+         * [uid] => 6049882567 )
+         */
+        setcookie('wb_accesstoken', $wb_auth['access_token'], time() + $wb_auth['expires_in']);
+        setcookie('wb_uid', $wb_auth['wb_uid'], time() + $wb_auth['expires_in']);
+
+        //如果用户没有绑定,则让用户重新注册
+        return $this->redirect(['wbreg']);
+    }
+
+    public function actionWbreg(){
+        //加载视图
+        $this->layout = 'layout2';
+        $model = new User;
+
+        /**
+         * 如果提交信息成功,就开始执行注册,
+         * 否则跳回qq绑定页面
+         */
+        if (Yii::$app->request->isPost) {
+            $post = Yii::$app->request->post();
+            $session = Yii::$app->session;
+            $post['User']['openid'] = $session['openid'];
+
+            /**
+             * 开始注册,设置新的注册场景qqreg,
+             * 如果祝成功,保存用户登录信息到session,之后跳转到首页
+             */
+            if ($model->reg($post, 'qqreg')) {
+                $session['loginname'] = $session['userinfo']['nickname'];
+                $session['isLogin'] = 1;
+                return $this->redirect(['index/index']);
+            }
+            /**
+             * yii2调试方法
+             */
+//            var_dump($model->getErrors());
+        }
+
+        return $this->render('wbreg', ['model' => $model]);
     }
 }
